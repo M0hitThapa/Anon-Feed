@@ -7,7 +7,7 @@ const userNameQuerySchema = z.object({
     username:userNameValidation
 })
 
-export default async function(request:Request) {
+export  async function GET (request:Request) {
 
     await dbConnect()
 
