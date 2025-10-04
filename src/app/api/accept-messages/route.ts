@@ -66,3 +66,61 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function GET(request: Request) {
+  await dbConnect();
+
+  const session = await auth();
+
+  const user = await session?.user;
+  if (!session || !session.user) {
+    return Response.json(
+      {
+        success: false,
+        message: "not authenticated",
+      },
+      {
+        status: 401,
+      }
+    );
+  }
+
+  const userId = await user._id;
+
+  try {
+    const foundUser = await UserModel.findById(userId);
+
+    if (!foundUser) {
+      return Response.json(
+        {
+          success: false,
+          message: "user not found",
+        },
+        {
+          status: 404,
+        }
+      );
+    } else {
+      return Response.json(
+        {
+          success: true,
+          isAcceptingMessages: foundUser.isAcceptingMessage,
+        },
+        {
+          status: 200,
+        }
+      );
+    }
+  } catch (error) {
+    console.log("Error is getting message accepting status", error);
+    return Response.json(
+      {
+        success: false,
+        message: "error is getting message acceptance status",
+      },
+      {
+        status: 401,
+      }
+    );
+  }
+}
